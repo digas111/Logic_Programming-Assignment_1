@@ -1,3 +1,5 @@
+:- use_module(library(lists)).
+
 
 pvars([x,y,z]).
 pvar(X):-pvars(V), member(X,V).
@@ -21,6 +23,15 @@ polynomial(P+M):-monomial(M),polynomial(P),!.
 % poly2list(M-P,[M|R]):-monomial(M),poly2list(P,R),!.
 % poly2list(M,[M]):-monomial(M),!.
 
-poly2list(M+P,[P|R]):-poly2list(M,R),!.
-poly2list(M-P,[P|R]):-poly2list(M,R),!.
-poly2list(M,[M]).
+% poly2list(P+M,[M|R]):-poly2list(P,R),!.
+% poly2list(P-M,[M|R]):-poly2list(P,R),!.
+% poly2list(M,[M]):-monomial(M).
+
+poly2list(P+M,[M|R]):-poly2list(P,R),!.
+poly2list(P-M,[M|R]):-poly2list(P,R),!.
+poly2list(M,[M]):-monomial(M).
+
+
+% poly2list(P+M,L):-append(L,M,X),poly2list(P,X),!.
+% poly2list(P-M,L):-append(L,M,X),poly2list(P,X),!.
+% poly2list(M,[M]):-monomial(M),!.
