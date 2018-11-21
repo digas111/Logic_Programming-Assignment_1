@@ -27,6 +27,7 @@ polynomial(P+M):-monomial(M),polynomial(P),!.
 % poly2list(P-M,[M|R]):-poly2list(P,R),!.
 % poly2list(M,[M]):-monomial(M).
 
+
 poly2list(P+M,[M|R]):-poly2list(P,R),!.
 poly2list(P-M,[M|R]):-poly2list(P,R),!.
 poly2list(M,[M]):-monomial(M).
