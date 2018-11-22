@@ -1,5 +1,6 @@
 :- use_module(library(lists)).
 :-op(500, xfy, '+').
+:-op(500, xfy, '-').
 
 pvars([x,y,z]).
 pvar(X):-pvars(V), member(X,V).
