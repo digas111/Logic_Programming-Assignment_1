@@ -14,6 +14,7 @@ monomial(X):-pvar(X),!.
 monomial(N):-number(N),!.
 monomial(X):-power(X),!.
 monomial(K*X):-coefficient(K),power(X),!.
+monomial(X*K):-coefficient(K),power(X),!.
 
 polynomial(M):-monomial(M),!.
 polynomial(P+M):-monomial(M),polynomial(P),!.
