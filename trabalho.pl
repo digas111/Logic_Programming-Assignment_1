@@ -1,6 +1,6 @@
 :- use_module(library(lists)).
-:-op(500, xfy, '+').
-:-op(500, xfy, '-').
+% :-op(500, xfy, '+').
+% :-op(500, xfy, '-').
 
 pvars([x,y,z]).
 pvar(X):-pvars(V), member(X,V).
@@ -21,23 +21,21 @@ polynomial(M):-monomial(M),!.
 polynomial(P+M):-monomial(M),polynomial(P),!.
 
 
-% poly2list(M+P,[M|R]):-monomial(M), poly2list(P,R),!.
-% poly2list(M-P,[M|R]):-monomial(M),poly2list(P,R),!.
-% poly2list(M,[M]):-monomial(M),!.
+%não funciona quando o negativo está no meio
 
-poly2list(M,[M]):-monomial(M).
-poly2list(M+P,[M|R]):-poly2list(P,R),!.
-poly2list(M-P,[M|R]):-poly2list(P,R),!.
-
-% poly2list([],L).
-% poly2list(P+M,[M|L]):-poly2list(P,[M|L]),!.
-% poly2list(P-M,[M|L]):-poly2list(P,[M|L]),!.
-% poly2list(M,[M|L]):-poly2list([],[M|L]),!.
+% poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
+%
+%
+% poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
+% poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
+% poly2listA(M,[M]):- monomial(M).
 
 
-% poly2list(P+M,L):-append(L,M,X),poly2list(P,X),!.
-% poly2list(P-M,L):-append(L,M,X),poly2list(P,X),!.
-% poly2list(M,[M]):-monomial(M),!.
+poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
+
+poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
+poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
+poly2listA(M,[M]):- monomial(M).
 
 
 simpoly_list().
