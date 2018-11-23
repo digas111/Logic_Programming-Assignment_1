@@ -49,12 +49,11 @@ simmon(M,M).
 simpoly(M,M2):-monomial(M), simmon(M,M2),!.
 simpoly(P+0,P):-!.
 simpoly(0+P,P):-monomial(P),!.
-simpoly(P+M,P2+M2):-simpoly(P,P2), simmon(M,M2).
-% simpoly(P+M,P2+M3):-
-%     monparts(M,_,XExp),
-%     delmonomial(P,XExp,M2,P2),!,
-%     addmonomial(M,M2,M3).
-% simpoly(P+M,P2+M2):-simpoly(P,P2),simmon(M,M2).
+simpoly(P+M,P2+M3):-
+    monparts(M,_,XExp),
+    delmonomial(P,XExp,M2,P2),!,
+    addmonomial(M,M2,M3).
+simpoly(P+M,P2+M2):-simpoly(P,P2),simmon(M,M2).
 
 monparts(X^N,0,X^N):-power(X^N),!.
 monparts(K*P,K,P):-number(K),!.
@@ -75,7 +74,7 @@ addmonomial(K1,K2,K3):-
   K3 is K1+K2.
 addmonomial(M1,M2,M3):-
     monparts(M1,K1,XExp),
-    monparts(M1,K1,XExp),
+    monparts(M1,K2,XExp),
     K3 is K1+K2,
     aux_addmonomial(K3,XExp,M3).
 
