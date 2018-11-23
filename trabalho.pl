@@ -40,15 +40,21 @@ poly2listA(M,[M]):- monomial(M).
 
 simpoly_list().
 
+
+simmon(1*P,P):- power(P),!.
+simmon(0*_,0):-!.
+simmon(M,M).
+
 % simpoly(M,M2):-monomial(M), simmon(M,M2),!.
+simpoly(M,M2):-monomial(M), simmon(M,M2),!.
 simpoly(P+0,P):-!.
 simpoly(0+P,P):-monomial(P),!.
 simpoly(P+M,P2+M2):-simpoly(P,P2), simmon(M,M2).
-simpoly(P+M,P2+M3):-
-    monparts(M,_,XExp),
-    delmonomial(P,XExp,M2,P2),!,
-    addmonomial(M,M2,M3).
-simpoly(P+M,P2+M2):-simpoly(P,P2),simmon(M,M2).
+% simpoly(P+M,P2+M3):-
+%     monparts(M,_,XExp),
+%     delmonomial(P,XExp,M2,P2),!,
+%     addmonomial(M,M2,M3).
+% simpoly(P+M,P2+M2):-simpoly(P,P2),simmon(M,M2).
 
 monparts(X^N,0,X^N):-power(X^N),!.
 monparts(K*P,K,P):-number(K),!.
@@ -78,9 +84,7 @@ aux_addmonomial(0,_,0):-!.
 aux_addmonomial(1,XExp,XExp):-!.
 aux_addmonomial(K,XExp,K*XExp).
 
-simmon(1*P,P):- power(P),!.
-simmon(0*_,0):-!.
-simmon(M,M).
+
 
 scalepoly().
 
