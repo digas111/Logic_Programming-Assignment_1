@@ -10,7 +10,6 @@ power(X^Y):-pvar(X),integer(Y),Y>1,!.
 
 coefficient(K):-number(K).
 
-
 monomial(X):-pvar(X),!.
 monomial(N):-number(N),!.
 monomial(X):-power(X),!.
@@ -20,30 +19,20 @@ monomial(X*K):-coefficient(K),power(X),!.
 polynomial(M):-monomial(M),!.
 polynomial(P+M):-monomial(M),polynomial(P),!.
 
-
-%não funciona quando o negativo está no meio
-
-% poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
-%
-%
-% poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
-% poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
-% poly2listA(M,[M]):- monomial(M).
-
-
+%--1--
 poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
 
 poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
 poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
 poly2listA(M,[M]):- monomial(M).
 
-
-aux_simpoly_list().
-
-
-simmon(1*P,P):- power(P),!.
-simmon(0*_,0):-!.
-simmon(M,M).
+%--2--
+simpoly(P,P):-
+  aux_simpoly(P,P2),
+  P==P2,!.
+simpoly(P,P3):-
+  aux_simpoly(P,P2),
+  aux_simpoly(P2,P3),!.
 
 aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
 aux_simpoly(P+0,P):-!.
@@ -53,6 +42,10 @@ aux_simpoly(P+M,P2+M3):-
     delmonomial(P,XExp,M2,P2),!,
     addmonomial(M,M2,M3).
 aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
+
+simmon(1*P,P):- power(P),!.
+simmon(0*_,0):-!.
+simmon(M,M).
 
 monparts(X^N,0,X^N):-power(X^N),!.
 monparts(K*P,K,P):-number(K),!.
@@ -82,13 +75,11 @@ aux_addmonomial(0,_,0):-!.
 aux_addmonomial(1,XExp,XExp):-!.
 aux_addmonomial(K,XExp,K*XExp).
 
-simpoly(P,P):-
-  aux_simpoly(P,P2),
-  P==P2,!.
-simpoly(P,P3):-
-  aux_simpoly(P,P2),
-  aux_simpoly(P2,P3),!.
+%--3--
+simpoly_list(L1,L2):-poly2list(P, L1), simpoly(P,P2), poly2list(P2,L2).
 
+%--4--
 scalepoly().
 
+%--5--
 addpoly().
