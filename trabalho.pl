@@ -38,22 +38,21 @@ poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
 poly2listA(M,[M]):- monomial(M).
 
 
-simpoly_list().
+aux_simpoly_list().
 
 
 simmon(1*P,P):- power(P),!.
 simmon(0*_,0):-!.
 simmon(M,M).
 
-% simpoly(M,M2):-monomial(M), simmon(M,M2),!.
-simpoly(M,M2):-monomial(M), simmon(M,M2),!.
-simpoly(P+0,P):-!.
-simpoly(0+P,P):-monomial(P),!.
-simpoly(P+M,P2+M3):-
+aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
+aux_simpoly(P+0,P):-!.
+aux_simpoly(0+P,P):-monomial(P),!.
+aux_simpoly(P+M,P2+M3):-
     monparts(M,_,XExp),
     delmonomial(P,XExp,M2,P2),!,
     addmonomial(M,M2,M3).
-simpoly(P+M,P2+M2):-simpoly(P,P2),simmon(M,M2).
+aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
 
 monparts(X^N,0,X^N):-power(X^N),!.
 monparts(K*P,K,P):-number(K),!.
@@ -74,7 +73,7 @@ addmonomial(K1,K2,K3):-
   K3 is K1+K2.
 addmonomial(M1,M2,M3):-
     monparts(M1,K1,XExp),
-    monparts(M1,K2,XExp),
+    monparts(M2,K2,XExp),
     K3 is K1+K2,
     aux_addmonomial(K3,XExp,M3).
 
@@ -83,7 +82,12 @@ aux_addmonomial(0,_,0):-!.
 aux_addmonomial(1,XExp,XExp):-!.
 aux_addmonomial(K,XExp,K*XExp).
 
-
+simpoly(P,P):-
+  aux_simpoly(P,P2),
+  P==P2,!.
+simpoly(P,P3):-
+  aux_simpoly(P,P2),
+  aux_simpoly(P2,P3),!.
 
 scalepoly().
 
