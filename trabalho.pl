@@ -1,12 +1,16 @@
-:- use_module(library(lists)).
+ :- use_module(library(lists)).
 % :-op(500, xfy, '+').
 % :-op(500, xfy, '-').
+
+% simplificação de expoentes
+% scalepoly
 
 pvars([x,y,z]).
 pvar(X):-pvars(V), member(X,V).
 
-power(X):-pvar(X),!.
+
 power(X^Y):-pvar(X),integer(Y),Y>1,!.
+power(X):-pvar(X),!.
 
 coefficient(K):-number(K).
 
@@ -32,25 +36,56 @@ simpoly(P,P):-
   P==P2,!.
 simpoly(P,P3):-
   aux_simpoly(P,P2),
-  aux_simpoly(P2,P3),!.
+  simpoly(P2,P3),!.
 
-aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
+
+aux_simpoly(P-0,P):-!.
+aux_simpoly(0-M,-M):-monomial(M),!.
+aux_simpoly(P-M,P2-M3):-
+  monparts(M,_,XExp),
+  delmonomial(P,XExp,M2,P2),!,
+  submonomial(M,M2,M3).
+aux_simpoly(P-M,P2-M2):-aux_simpoly(P,P2),simmon(M,M2).
+
 aux_simpoly(P+0,P):-!.
-aux_simpoly(0+P,P):-monomial(P),!.
+aux_simpoly(0+M,M):-monomial(M),!.
 aux_simpoly(P+M,P2+M3):-
     monparts(M,_,XExp),
     delmonomial(P,XExp,M2,P2),!,
     addmonomial(M,M2,M3).
 aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
 
+aux_simpoly(_*0,0):-!.
+aux_simpoly(0*_,0):-!.
+aux_simpoly(_*M,_*M3):-
+    mulmonomial(M,M2,M3).
+aux_simpoly(P*M,P2*M):-aux_simpoly(P,P2),simmon(M,M2).
+
+
+aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
+
 simmon(1*P,P):- power(P),!.
 simmon(0*_,0):-!.
 simmon(M,M).
 
-monparts(X^N,0,X^N):-power(X^N),!.
+mult(K1*K2,R):-number(K1), number(K2), R is K1*K2,!.
+
+monparts(X^N,1,X^N):-power(X^N),!.
 monparts(K*P,K,P):-number(K),!.
+monparts(P*K,K,P):-number(K),!.
 monparts(K,K,indep):-number(K),!.
 monparts(X,1,X):-pvar(X),!.
+
+expmonparts(X^N,N,X):-power(X^N),!.
+
+delmonomial(M,X,M,0):-
+  monomial(M),monparts(M,_,X),!.
+delmonomial(M-M2,X,M,M2):-
+  monomial(M2),monomial(M),monparts(M,_,X),!.
+delmonomial(P-M,X,M,P):-
+  monomial(M),monparts(M,_,X),!.
+delmonomial(P-M2,X,M,P2-M2):-
+  delmonomial(P,X,M,P2).
 
 delmonomial(M,X,M,0):-
   monomial(M),monparts(M,_,X),!.
@@ -60,6 +95,37 @@ delmonomial(P+M,X,M,P):-
   monomial(M),monparts(M,_,X),!.
 delmonomial(P+M2,X,M,P2+M2):-
   delmonomial(P,X,M,P2).
+
+mulmonomial(K1,K2,K3):-
+  number(K1),number(K2),!,
+  K3 is K1*K2.
+mulmonomial(K1,M2,M3):-
+  number(K1),
+  monparts(M2,K2,XExp),
+  K3 is K1*K2,
+  aux_mulmonomial(K3,XExp,M3),!.
+mulmonomial(M1,K2,M3):-
+  number(K2),
+  monparts(M1,K1,XExp),
+  K3 is K1*K2,
+  aux_mulmonomial(K3,XExp,M3),!.
+mulmonomial(M1,M2,M3):-
+  expmonparts(M1,K1,XExp),
+  expmonparts(M2,K2,XExp),
+  K3 is K1+K2,
+  exp_mulmonomial(K3,XExp,M3).
+
+exp_mulmonomial(K,indep,K):-!.
+exp_mulmonomial(0,_,1):-!.
+exp_mulmonomial(1,XExp,XExp):-!.
+exp_mulmonomial(K,XExp,XExp^K).
+
+aux_mulmonomial(K,indep,K):-!.
+aux_mulmonomial(0,_,0):-!.
+aux_mulmonomial(1,XExp,XExp):-!.
+aux_mulmonomial(K,XExp,K*XExp).
+
+
 
 addmonomial(K1,K2,K3):-
   number(K1),number(K2),!,
@@ -75,11 +141,29 @@ aux_addmonomial(0,_,0):-!.
 aux_addmonomial(1,XExp,XExp):-!.
 aux_addmonomial(K,XExp,K*XExp).
 
+submonomial(K1,K2,K3):-
+  number(K1),number(K2),!,
+  K3 is K1-K2.
+submonomial(M1,M2,M3):-
+    monparts(M1,K1,XExp),
+    monparts(M2,K2,XExp),
+    K3 is K1-K2,
+    aux_submonomial(K3,XExp,M3).
+
+aux_submonomial(K,indep,K):-!.
+aux_submonomial(0,_,0):-!.
+aux_submonomial(1,XExp,XExp):-!.
+aux_submonomial(K,XExp,K*XExp).
+
 %--3--
 simpoly_list(L1,L2):-poly2list(P, L1), simpoly(P,P2), poly2list(P2,L2).
 
 %--4--
-scalepoly().
+scalepoly(P1,K,P3):-number(K), poly2list(P1,LP1), aux_scalepoly(LP1,K,LP3), poly2list(TSP3,LP3), simpoly(TSP3,P3).
+
+aux_scalepoly([],_,[]).
+aux_scalepoly([M|P],K,[RM|P2]):- simpoly(M*K,RM), aux_scalepoly(P,K,P2).
 
 %--5--
-addpoly().
+% addpoly(P1,P2,R):- simpoly(P1+P2,R).
+addpoly(X,Y,Z):- poly2list(X,XL), poly2list(Y,YL), append(XL,YL,RL), poly2list(RP,RL), simpoly(RP,Z).
