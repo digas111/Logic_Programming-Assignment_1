@@ -72,7 +72,10 @@ aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
 aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
 
 simmon(1*P,P):- power(P),!.
+simmon(P*1,P):- power(P),!.
 simmon(0*_,0):-!.
+simmon(_*0,0):-!.
+%simmon(K1*K2,R):-number(K1), number(K2), R is K1*K2,!.
 simmon(M,M).
 
 mult(K1*K2,R):-number(K1), number(K2), R is K1*K2,!.
