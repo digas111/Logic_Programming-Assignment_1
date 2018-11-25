@@ -39,6 +39,17 @@ simpoly(P,P3):-
   simpoly(P2,P3),!.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+aux_simpoly(_*0,0):-!.
+aux_simpoly(0*_,0):-!.
+aux_simpoly(M1*M2,M3):-
+    mulmonomial(M1,M2,M3).
+%aux_simpoly(P*M,P2*M2):-aux_simpoly(P,P2),aux_simpoly(M,M2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 aux_simpoly(P-0,P):-!.
 aux_simpoly(0-M,-M):-monomial(M),!.
 aux_simpoly(P-M,P2-M3):-
@@ -55,11 +66,7 @@ aux_simpoly(P+M,P2+M3):-
     addmonomial(M,M2,M3).
 aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
 
-aux_simpoly(_*0,0):-!.
-aux_simpoly(0*_,0):-!.
-aux_simpoly(_*M,_*M3):-
-    mulmonomial(M,M2,M3).
-aux_simpoly(P*M,P2*M):-aux_simpoly(P,P2),simmon(M,M2).
+
 
 
 aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
@@ -96,6 +103,8 @@ delmonomial(P+M,X,M,P):-
 delmonomial(P+M2,X,M,P2+M2):-
   delmonomial(P,X,M,P2).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 mulmonomial(K1,K2,K3):-
   number(K1),number(K2),!,
   K3 is K1*K2.
@@ -125,7 +134,7 @@ aux_mulmonomial(0,_,0):-!.
 aux_mulmonomial(1,XExp,XExp):-!.
 aux_mulmonomial(K,XExp,K*XExp).
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 addmonomial(K1,K2,K3):-
   number(K1),number(K2),!,
