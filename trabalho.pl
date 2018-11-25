@@ -14,6 +14,7 @@ power(X):-pvar(X),!.
 
 coefficient(K):-number(K).
 
+
 monomial(X):-pvar(X),!.
 monomial(N):-number(N),!.
 monomial(X):-power(X),!.
@@ -23,13 +24,24 @@ monomial(X*K):-coefficient(K),power(X),!.
 polynomial(M):-monomial(M),!.
 polynomial(P+M):-monomial(M),polynomial(P),!.
 
-%--1--
+
+%não funciona quando o negativo está no meio
+
+% poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
+%
+%
+% poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
+% poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
+% poly2listA(M,[M]):- monomial(M).
+
+
 poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
 
 poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
 poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
 poly2listA(M,[M]):- monomial(M).
 
+<<<<<<< HEAD
 %--2--
 simpoly(P,P):-
   aux_simpoly(P,P2),
@@ -57,6 +69,15 @@ aux_simpoly(P-M,P2-M3):-
   delmonomial(P,XExp,M2,P2),!,
   submonomial(M,M2,M3).
 aux_simpoly(P-M,P2-M2):-aux_simpoly(P,P2),simmon(M,M2).
+=======
+
+aux_simpoly_list().
+
+
+simmon(1*P,P):- power(P),!.
+simmon(0*_,0):-!.
+simmon(M,M).
+>>>>>>> parent of 5e3db0f... simpoly_list funciona apenas para somas
 
 aux_simpoly(P+0,P):-!.
 aux_simpoly(0+M,M):-monomial(M),!.
@@ -66,6 +87,7 @@ aux_simpoly(P+M,P2+M3):-
     addmonomial(M,M2,M3).
 aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
 
+<<<<<<< HEAD
 
 
 
@@ -81,6 +103,9 @@ simmon(M,M).
 mult(K1*K2,R):-number(K1), number(K2), R is K1*K2,!.
 
 monparts(X^N,1,X^N):-power(X^N),!.
+=======
+monparts(X^N,0,X^N):-power(X^N),!.
+>>>>>>> parent of 5e3db0f... simpoly_list funciona apenas para somas
 monparts(K*P,K,P):-number(K),!.
 monparts(P*K,K,P):-number(K),!.
 monparts(K,K,indep):-number(K),!.
@@ -153,6 +178,7 @@ aux_addmonomial(0,_,0):-!.
 aux_addmonomial(1,XExp,XExp):-!.
 aux_addmonomial(K,XExp,K*XExp).
 
+<<<<<<< HEAD
 submonomial(K1,K2,K3):-
   number(K1),number(K2),!,
   K3 is K1-K2.
@@ -179,3 +205,15 @@ aux_scalepoly([M|P],K,[RM|P2]):- simpoly(M*K,RM), aux_scalepoly(P,K,P2).
 %--5--
 % addpoly(P1,P2,R):- simpoly(P1+P2,R).
 addpoly(X,Y,Z):- poly2list(X,XL), poly2list(Y,YL), append(XL,YL,RL), poly2list(RP,RL), simpoly(RP,Z).
+=======
+simpoly(P,P):-
+  aux_simpoly(P,P2),
+  P==P2,!.
+simpoly(P,P3):-
+  aux_simpoly(P,P2),
+  aux_simpoly(P2,P3),!.
+
+scalepoly().
+
+addpoly().
+>>>>>>> parent of 5e3db0f... simpoly_list funciona apenas para somas
