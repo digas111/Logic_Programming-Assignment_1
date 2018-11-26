@@ -27,9 +27,12 @@ polynomial(P+M):-monomial(M),polynomial(P),!.
 %--1--
 poly2list(P,L):-reverse(X,L),poly2listA(P,X),!.
 
-poly2listA(P-M,[-M|R]):-poly2listA(P,R),!.
+poly2listA(P-M,[T|R]):- number(M), T is -M, poly2listA(P,R),!.
+poly2listA(P-M,[M|-R]):-poly2listA(P,R),!.
 poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
-poly2listA(M,[M]):- monomial(M).
+poly2listA(M,[M]):- monomial(M),!.
+%poly2listA(P*M,[P*M]).
+%poly2listA(M,[M]).
 
 %--2--
 simpoly(P,P):-
@@ -68,15 +71,23 @@ aux_simpoly(P-M,P2-R):-
  submonomial(M2,M,M3), takeminus(M3,R).
 
 
-% aux_simpoly(P-M,P2-M3):-
-% monparts(M,_,XExp),
-% delmonomial(P,XExp,M2,P2),!,
-% submonomial(M2,M,M3).
-% aux_simpoly(P-M,P2-M2):-aux_simpoly(P,P2),simmon(M,M2).
+aux_simpoly(P-M,P2-M3):-
+monparts(M,_,XExp),
+delmonomial(P,XExp,M2,P2),!,
+submonomial(M2,M,M3).
+aux_simpoly(P-M,P2-M2):-aux_simpoly(P,P2),simmon(M,M2).
 
 
 aux_simpoly(P+0,P):-!.
 aux_simpoly(0+M,M):-monomial(M),!.
+
+aux_simpoly(P+M,P2-R):-
+   monparts(M,_,XExp),
+   delmonomial(P,XExp,M2,P2),
+   addmonomial(M,M2,M3),
+   M3 < 0,
+   takeminus(M3,R).
+
 aux_simpoly(P+M,P2+M3):-
    monparts(M,_,XExp),
    delmonomial(P,XExp,M2,P2),!,
@@ -113,6 +124,13 @@ delmonomial(M-M2,X,M,NM):-
 delmonomial(P-M,X,NM,P):-
  number(M),NM is -M, monparts(NM,_,X),!.
 
+
+delmonomial(M-K*M2,X,M,NK*M2):-
+monomial(M2),monomial(M),monparts(M,_,X), NK is -K,!.
+delmonomial(P-M,X,-M,P):-
+monomial(M),monparts(M,_,X),!.
+
+
 delmonomial(M-M2,X,M,-M2):-
 monomial(M2),monomial(M),monparts(M,_,X),!.
 delmonomial(P-M,X,-M,P):-
@@ -144,8 +162,8 @@ mulmonomial(M1,K2,M3):-
  K3 is K1*K2,
  aux_mulmonomial(K3,XExp,M3),!.
 mulmonomial(M1,M2,M3):-
- expmonparts(M1,K1,XExp),
- expmonparts(M2,K2,XExp),
+ monparts(M1,K1,XExp),
+ monparts(M2,K2,XExp),
  K3 is K1+K2,
  exp_mulmonomial(K3,XExp,M3).
 
@@ -202,7 +220,7 @@ simpoly_list(L1,L2):-poly2list(P, L1), simpoly(P,P2), poly2list(P2,L2).
 scalepoly(P1,K,P3):-number(K), poly2list(P1,LP1), aux_scalepoly(LP1,K,LP3), poly2list(TSP3,LP3), simpoly(TSP3,P3).
 
 aux_scalepoly([],_,[]).
-aux_scalepoly([M|P],K,[RM|P2]):- simpoly(M*K,RM), aux_scalepoly(P,K,P2).
+aux_scalepoly([M|P],K,[RM|P2]):- mulmonomial(M,K,RM), aux_scalepoly(P,K,P2).
 
 %--5--
 % addpoly(P1,P2,R):- simpoly(P1+P2,R).
