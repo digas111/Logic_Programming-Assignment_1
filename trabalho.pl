@@ -1,9 +1,4 @@
 :- use_module(library(lists)).
-% :-op(500, xfy, '+').
-% :-op(500, xfy, '-').
-
-% simplificação de expoentes
-% scalepoly
 
 pvars([x,y,z]).
 pvar(X):-pvars(V), member(X,V).
@@ -31,8 +26,7 @@ poly2listA(P-M,[T|R]):- number(M), T is -M, poly2listA(P,R),!.
 poly2listA(P-M,[M|-R]):-poly2listA(P,R),!.
 poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
 poly2listA(M,[M]):- monomial(M),!.
-%poly2listA(P*M,[P*M]).
-%poly2listA(M,[M]).
+
 
 %--2--
 simpoly(P,P):-
@@ -235,21 +229,5 @@ scalepoly(P1,K,P3):-number(K), poly2list(P1,LP1), aux_scalepoly(LP1,K,LP3), poly
 aux_scalepoly([],_,[]).
 aux_scalepoly([M|P],K,[RM|P2]):- mulmonomial(M,K,RM), aux_scalepoly(P,K,P2).
 
-
-
-
-% aux_scalepoly(M,K,T*M2):- monparts(M,M1,M2), T is M1*K.
-%
-%
-% scalepoly(P+M,K,P2+M2):-number(K), aux_scalepoly(M,K,P2), scalepoly(P,K,M2).
-
-
-
-% poly2listA(P-M,[T|R]):- number(M), T is -M, poly2listA(P,R),!.
-% poly2listA(P-M,[M|-R]):-poly2listA(P,R),!.
-% poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
-% poly2listA(M,[M]):- monomial(M),!.
-
 %--5--
-% addpoly(P1,P2,R):- simpoly(P1+P2,R).
 addpoly(X,Y,Z):- poly2list(X,XL), poly2list(Y,YL), append(XL,YL,RL), poly2list(RP,RL), simpoly(RP,Z).
