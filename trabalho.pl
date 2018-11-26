@@ -54,8 +54,8 @@ simpoly(P,P3):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 takeminus(M1,M2):- number(M1), M1 < 0, M2 is M1*(-1),!.
-takeminus(-M,M).
-takeminus(-1*M,M).
+takeminus(-M,M):-!.
+takeminus(-1*M,M):-!.
 takeminus(M1,M1).
 
 aux_simpoly(P-0,P):-!.
@@ -82,6 +82,7 @@ aux_simpoly(P+0,P):-!.
 aux_simpoly(0+M,M):-monomial(M),!.
 
 aux_simpoly(P+M,P2-R):-
+  number(M),
    monparts(M,_,XExp),
    delmonomial(P,XExp,M2,P2),
    addmonomial(M,M2,M3),
@@ -147,6 +148,18 @@ delmonomial(P+M2,X,M,P2+M2):-
  delmonomial(P,X,M,P2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+mulmonomial(K1,K2,NK1*NK2):-
+  not(number(K2)),
+  takeminus(K2,NK2),
+  NK2 \= K2,!,
+  NK1 is K1*(-1).
+
+mulmonomial(K1,K2,NK2*NK1):-
+  not(number(K1)),
+  takeminus(K1,NK1),
+  NK1 \= K1,!,
+  NK2 is K2*(-1).
 
 mulmonomial(K1,K2,K3):-
  number(K1),number(K2),!,
@@ -221,6 +234,21 @@ scalepoly(P1,K,P3):-number(K), poly2list(P1,LP1), aux_scalepoly(LP1,K,LP3), poly
 
 aux_scalepoly([],_,[]).
 aux_scalepoly([M|P],K,[RM|P2]):- mulmonomial(M,K,RM), aux_scalepoly(P,K,P2).
+
+
+
+
+% aux_scalepoly(M,K,T*M2):- monparts(M,M1,M2), T is M1*K.
+%
+%
+% scalepoly(P+M,K,P2+M2):-number(K), aux_scalepoly(M,K,P2), scalepoly(P,K,M2).
+
+
+
+% poly2listA(P-M,[T|R]):- number(M), T is -M, poly2listA(P,R),!.
+% poly2listA(P-M,[M|-R]):-poly2listA(P,R),!.
+% poly2listA(P+M,[M|R]):-poly2listA(P,R),!.
+% poly2listA(M,[M]):- monomial(M),!.
 
 %--5--
 % addpoly(P1,P2,R):- simpoly(P1+P2,R).
