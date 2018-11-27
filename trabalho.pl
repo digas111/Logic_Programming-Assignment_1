@@ -88,7 +88,7 @@ aux_simpoly(P+M,P2+M3):-
    delmonomial(P,XExp,M2,P2),!,
    addmonomial(M,M2,M3).
 aux_simpoly(P+M,P2+M2):-aux_simpoly(P,P2),simmon(M,M2).
-
+%Adicionar outro caso para se M2 for negativo
 
 aux_simpoly(M,M2):-monomial(M), simmon(M,M2),!.
 
